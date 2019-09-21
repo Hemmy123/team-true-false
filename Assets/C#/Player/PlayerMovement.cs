@@ -355,5 +355,10 @@ public class PlayerMovement : MonoBehaviour
         {
             m_currentWaypoint = null;
         }
+
+        if (collision.tag == "Boundary" && m_state != PlayerState.TRANSITIONING)
+        {
+            Utils.RestartLevel();
+        }
     }
 }
