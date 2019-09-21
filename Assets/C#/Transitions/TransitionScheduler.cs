@@ -25,6 +25,11 @@ public class TransitionScheduler : MonoBehaviour
     {
         m_beatManager = SingletonObject.GetSingleton("BeatManager").GetComponent<BeatManager>();
         m_transition = GetComponent<Transition>();
+
+        Transform t = m_waypoints[m_waypoints.Length - 1].transform;
+        transform.position = t.position;
+        transform.eulerAngles = t.eulerAngles;
+        transform.localScale = t.localScale;
     }
 
     //

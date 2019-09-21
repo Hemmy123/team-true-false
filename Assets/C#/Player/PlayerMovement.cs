@@ -38,7 +38,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float m_dragGrounded = 10f;//scaled by (bpm / 120f)
     [SerializeField] float m_baseJumpSpeed = 5f;
     [SerializeField] float m_jumpAssistGravityReduction = 0.25f;
+    [SerializeField] float m_coyoteTime = 0.2f;
     float m_gravity = 0f;
+    float m_remainingCoyoteTime = 0f;
 
     //
     SuperJumpZone m_currentZone = null;
@@ -226,21 +228,12 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    //
-    void GroundedMovement()
+    void JumpMovement()
     {
-        if(EnterDDR())
-        {
-            m_particles.Play();
-            return;
-        }
-
-        HorizontalMovement();
-
-        //Jump stuff
-        if(Input.GetKey(m_upKey))
+        if (Input.GetKey(m_upKey))
         {
             m_state = PlayerState.AIRBORNE;
+            m_remainingCoyoteTime = 0f;
 
             if (m_currentZone != null && m_currentZone.CorrectBeat())
             {
@@ -254,12 +247,33 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    //
+    void GroundedMovement()
+    {
+        if(EnterDDR())
+        {
+            m_particles.Play();
+            return;
+        }
+
+        HorizontalMovement();
+
+        //Jump stuff
+        JumpMovement();
+    }
+
     void AirborneMovement()
     {
         if (EnterDDR())
         {
             m_particles.Play();
             return;
+        }
+
+        if(m_remainingCoyoteTime > 0f)
+        {
+            JumpMovement();
+            m_remainingCoyoteTime -= Time.fixedDeltaTime;
         }
 
         HorizontalMovement();
@@ -284,6 +298,7 @@ public class PlayerMovement : MonoBehaviour
             else if (m_state == PlayerState.GROUNDED)
             {
                 m_state = PlayerState.AIRBORNE;
+                m_remainingCoyoteTime = m_coyoteTime;
             }
         }
     }
@@ -328,6 +343,7 @@ public class PlayerMovement : MonoBehaviour
             m_state = PlayerState.TRANSITIONING;
         }
         DisablePhysics();
+        m_remainingCoyoteTime = 0f;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
