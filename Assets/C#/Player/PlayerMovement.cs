@@ -21,6 +21,8 @@ public class PlayerMovement : MonoBehaviour
     Transition m_transitioner;
     Collider2D m_collider2D;
     ParticleSystem m_particles;
+    [SerializeField] Animator m_animator;
+    AudioSource m_audioSource;
 
     //
     [SerializeField] LayerMask m_groundLayer;
@@ -56,15 +58,16 @@ public class PlayerMovement : MonoBehaviour
         m_transitioner = GetComponent<Transition>();
         m_collider2D = GetComponent<Collider2D>();
         m_particles = GetComponent<ParticleSystem>();
+        m_audioSource = GetComponent<AudioSource>();
 
         m_gravity = m_rb.gravityScale;
 
     }
 
     // Update is called once per frame
+    Vector3 m_previousPosition = Vector3.zero;
     void FixedUpdate()
     {
-        Debug.Log(m_state);
         if (m_state == PlayerState.TRANSITIONING && !m_transitioner.transitioning)
         {
             m_state = PlayerState.AIRBORNE;
@@ -90,19 +93,97 @@ public class PlayerMovement : MonoBehaviour
         {
             case PlayerState.GROUNDED:
                 GroundedMovement();
+                if (m_rb.velocity.x != 0f)
+                {
+                    SetRunning();
+                }
+                else
+                {
+                    SetIdle();
+                }
                 break;
             case PlayerState.AIRBORNE:
                 AirborneMovement();
+                if(m_rb.velocity.y > 0f)
+                {
+                    SetJumping();
+                }
+                else
+                {
+                    SetFalling();
+                }
                 break;
             case PlayerState.DDR:
                 DDRMovement();
+                SetDancing();
                 break;
             case PlayerState.FALLING:
-                
+                SetFalling();
+                break;
+            case PlayerState.TRANSITIONING:
+                SetFalling();
                 break;
             default:
                 break;
         }
+
+        if(Input.GetKeyDown(m_rightKey))//m_previousPosition.x < transform.position.x)
+        {
+            FaceRight();
+        }
+        else if(Input.GetKeyDown(m_leftKey))//m_previousPosition.x > transform.position.x)
+        {
+            FaceLeft();
+        }
+        m_previousPosition = transform.position;
+    }
+    void FaceLeft()
+    {
+        Vector3 scale = m_animator.transform.localScale;
+        m_animator.transform.localScale = new Vector3(-Mathf.Abs(scale.x), scale.y, -Mathf.Abs(scale.z));
+    }
+    void FaceRight()
+    {
+        Vector3 scale = m_animator.transform.localScale;
+        m_animator.transform.localScale = new Vector3(Mathf.Abs(scale.x), scale.y, Mathf.Abs(scale.z));
+    }
+    void SetFalling()
+    {
+        m_animator.SetBool("Falling", true);
+        m_animator.SetBool("Jumping", false);
+        m_animator.SetBool("Running", false);
+        m_animator.SetBool("Dance", false);
+    }
+    void SetRunning()
+    {
+        m_animator.SetBool("Falling", false);
+        m_animator.SetBool("Jumping", false);
+        m_animator.SetBool("Running", true);
+        m_animator.SetBool("Dance", false);
+    }
+    void SetJumping()
+    {
+        m_animator.SetBool("Falling", false);
+        m_animator.SetBool("Jumping", true);
+        m_animator.SetBool("Running", false);
+        m_animator.SetBool("Dance", false);
+        m_animator.transform.eulerAngles = new Vector3(0f, 90f, 0f);
+    }
+    void SetIdle()
+    {
+        m_animator.SetBool("Falling", false);
+        m_animator.SetBool("Jumping", false);
+        m_animator.SetBool("Running", false);
+        m_animator.SetBool("Dance", false);
+        m_animator.transform.eulerAngles = new Vector3(0f, 90f, 0f);
+    }
+    void SetDancing()
+    {
+        m_animator.SetBool("Falling", false);
+        m_animator.SetBool("Jumping", false);
+        m_animator.SetBool("Running", false);
+        m_animator.SetBool("Dance", true);
+        m_animator.transform.eulerAngles = new Vector3(0f, 180f, 0f);
     }
 
     void EnablePhysics()
@@ -211,14 +292,19 @@ public class PlayerMovement : MonoBehaviour
     {
         if(m_currentWaypoint != null)
         {
+            bool success = false;
             if(Input.GetKeyDown(m_upKey))
-                return m_currentWaypoint.JumpUp(this);
+                success = m_currentWaypoint.JumpUp(this);
             if(Input.GetKeyDown(m_downKey))
-                return m_currentWaypoint.JumpDown(this);
+                success = m_currentWaypoint.JumpDown(this);
             if (Input.GetKeyDown(m_leftKey))
-                return m_currentWaypoint.JumpLeft(this);
+                success = m_currentWaypoint.JumpLeft(this);
             if (Input.GetKeyDown(m_rightKey))
-                return m_currentWaypoint.JumpRight(this);
+                success = m_currentWaypoint.JumpRight(this);
+
+            if (success)
+                m_audioSource.Play();
+            return success;
         }
         return false;
     }
