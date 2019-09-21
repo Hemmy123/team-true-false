@@ -176,7 +176,6 @@ public class BeatManager : MonoBehaviour
         }
         else
         {
-            Debug.Log(beatFromBarStart + "," + lastBeatFromBarStart);
             return false;
         }
     }
