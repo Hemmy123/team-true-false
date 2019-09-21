@@ -22,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     Collider2D m_collider2D;
     ParticleSystem m_particles;
     [SerializeField] Animator m_animator;
+    AudioSource m_audioSource;
 
     //
     [SerializeField] LayerMask m_groundLayer;
@@ -57,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
         m_transitioner = GetComponent<Transition>();
         m_collider2D = GetComponent<Collider2D>();
         m_particles = GetComponent<ParticleSystem>();
+        m_audioSource = GetComponent<AudioSource>();
 
         m_gravity = m_rb.gravityScale;
 
@@ -290,14 +292,19 @@ public class PlayerMovement : MonoBehaviour
     {
         if(m_currentWaypoint != null)
         {
+            bool success = false;
             if(Input.GetKeyDown(m_upKey))
-                return m_currentWaypoint.JumpUp(this);
+                success = m_currentWaypoint.JumpUp(this);
             if(Input.GetKeyDown(m_downKey))
-                return m_currentWaypoint.JumpDown(this);
+                success = m_currentWaypoint.JumpDown(this);
             if (Input.GetKeyDown(m_leftKey))
-                return m_currentWaypoint.JumpLeft(this);
+                success = m_currentWaypoint.JumpLeft(this);
             if (Input.GetKeyDown(m_rightKey))
-                return m_currentWaypoint.JumpRight(this);
+                success = m_currentWaypoint.JumpRight(this);
+
+            if (success)
+                m_audioSource.Play();
+            return success;
         }
         return false;
     }
