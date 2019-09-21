@@ -10,7 +10,8 @@ public class PlayerMovement : MonoBehaviour
         GROUNDED,
         AIRBORNE,
         DDR,
-        TRANSITIONING
+        TRANSITIONING,
+        FALLING
     }
     PlayerState m_state = PlayerState.GROUNDED;
 
@@ -39,6 +40,13 @@ public class PlayerMovement : MonoBehaviour
 
     //
     SuperJumpZone m_currentZone = null;
+    DDRWaypoint m_currentWaypoint = null;
+    float m_ddrCurrentDuration = 0f;
+    public float ddrCurrentDuration
+    {
+        get { return m_ddrCurrentDuration; }
+        set { m_ddrCurrentDuration = value; }
+    }
 
     //
     private void Start()
@@ -56,13 +64,27 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        Debug.Log(m_state);
         if (m_state == PlayerState.TRANSITIONING && !m_transitioner.transitioning)
         {
-            m_state = PlayerState.GROUNDED;
-            m_rb.gravityScale = m_gravity;
-            m_collider2D.enabled = true;
+            m_state = PlayerState.AIRBORNE;
+            EnablePhysics();
         }
-        CheckIfLanded();
+        else if(m_state == PlayerState.DDR)
+        {
+            if(m_ddrCurrentDuration <= 0f)
+            {
+                m_state = PlayerState.FALLING;
+                EnablePhysics();
+            }
+            else
+            {
+                m_ddrCurrentDuration -= Time.fixedDeltaTime;
+            }
+        }
+
+        if(m_state == PlayerState.AIRBORNE || m_state == PlayerState.GROUNDED || m_state == PlayerState.FALLING)
+            CheckIfLanded();
 
         switch (m_state)
         {
@@ -75,9 +97,23 @@ public class PlayerMovement : MonoBehaviour
             case PlayerState.DDR:
                 DDRMovement();
                 break;
+            case PlayerState.FALLING:
+                
+                break;
             default:
                 break;
         }
+    }
+
+    void EnablePhysics()
+    {
+        m_rb.bodyType = RigidbodyType2D.Dynamic;
+        m_rb.gravityScale = m_gravity;
+    }
+    void DisablePhysics()
+    {
+        m_rb.bodyType = RigidbodyType2D.Kinematic;
+        m_rb.gravityScale = 0f;
     }
 
     void HorizontalMovement()
@@ -100,7 +136,7 @@ public class PlayerMovement : MonoBehaviour
         if (Mathf.Abs(m_rb.velocity.x) > m_speed * m_beatManager.currentBPM / 120f)
         {
             //If above max speed, slow down
-            m_rb.velocity = new Vector2(m_rb.velocity.x - Mathf.Sign(m_rb.velocity.x) * m_dragGrounded * modifier, m_rb.velocity.y);
+            m_rb.velocity = new Vector2(m_rb.velocity.x - Mathf.Sign(m_rb.velocity.x) * m_dragGrounded * modifier * Time.fixedDeltaTime, m_rb.velocity.y);
         }
         else
         {
@@ -112,6 +148,12 @@ public class PlayerMovement : MonoBehaviour
     //
     void GroundedMovement()
     {
+        if(EnterDDR())
+        {
+            m_particles.Play();
+            return;
+        }
+
         HorizontalMovement();
 
         //Jump stuff
@@ -133,45 +175,73 @@ public class PlayerMovement : MonoBehaviour
 
     void AirborneMovement()
     {
+        if (EnterDDR())
+        {
+            m_particles.Play();
+            return;
+        }
+
         HorizontalMovement();
 
-        if(Input.GetKey(m_upKey) && m_rb.velocity.y > 0f)
-        {
-            m_rb.gravityScale = m_gravity * m_jumpAssistGravityReduction;
-        }
-        else
-        {
-            m_rb.gravityScale = m_gravity;
-        }
+        //if(Input.GetKey(m_upKey) && m_rb.velocity.y > 0f)
+        //{
+        //    m_rb.gravityScale = m_gravity * m_jumpAssistGravityReduction;
+        //}
+        //else
+        //{
+        //    m_rb.gravityScale = m_gravity;
+        //}
     }
     void CheckIfLanded()
     {
-        if ((m_rb.velocity.y <= 0f || m_state == PlayerState.GROUNDED) && m_state != PlayerState.DDR && m_state != PlayerState.TRANSITIONING)
+        if ((m_rb.velocity.y <= 0f || m_state == PlayerState.GROUNDED))
         {
-            if (Physics2D.Raycast(transform.position + Vector3.right * 0.5f, Vector2.down, .75f, m_groundLayer) || Physics2D.Raycast(transform.position - Vector3.right * 0.5f, Vector2.down, .75f, m_groundLayer))
+            if (Physics2D.Raycast(transform.position + Vector3.right * 0.4f, Vector2.down, .75f, m_groundLayer) || Physics2D.Raycast(transform.position - Vector3.right * 0.4f, Vector2.down, .75f, m_groundLayer))
             {
                 m_state = PlayerState.GROUNDED;
-                m_rb.gravityScale = m_gravity;
             }
-            else
+            else if (m_state == PlayerState.GROUNDED)
             {
                 m_state = PlayerState.AIRBORNE;
             }
         }
     }
 
+    bool EnterDDR()
+    {
+        if(m_currentWaypoint != null)
+        {
+            if(Input.GetKeyDown(m_upKey))
+                return m_currentWaypoint.JumpUp(this);
+            if(Input.GetKeyDown(m_downKey))
+                return m_currentWaypoint.JumpDown(this);
+            if (Input.GetKeyDown(m_leftKey))
+                return m_currentWaypoint.JumpLeft(this);
+            if (Input.GetKeyDown(m_rightKey))
+                return m_currentWaypoint.JumpRight(this);
+        }
+        return false;
+    }
+
     //
     void DDRMovement()
     {
-
+        if(EnterDDR())
+            m_particles.Play(); ;
     }
 
-    public void ApplyTransition(Transform waypoint, float beatDuration)
+    public void ApplyTransition(Transform waypoint, float beatDuration, bool ddr = false)
     {
-        m_transitioner.StartTransition(waypoint, m_beatManager.BeatsToTime(beatDuration));
-        m_state = PlayerState.TRANSITIONING;
-        m_rb.gravityScale = 0f;
-        m_collider2D.enabled = false;
+        m_transitioner.StartTransition(waypoint, m_beatManager.BeatsToTime(beatDuration), false);
+        if(ddr)
+        {
+            m_state = PlayerState.DDR;
+        }
+        else
+        {
+            m_state = PlayerState.TRANSITIONING;
+        }
+        DisablePhysics();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -181,6 +251,11 @@ public class PlayerMovement : MonoBehaviour
         {
             m_currentZone = v;
         }
+        var v2 = collision.GetComponent<DDRWaypoint>();
+        if(v2 != null)
+        {
+            m_currentWaypoint = v2;
+        }
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
@@ -188,6 +263,11 @@ public class PlayerMovement : MonoBehaviour
         if(v == m_currentZone)
         {
             m_currentZone = null;
+        }
+        var v2 = collision.GetComponent<DDRWaypoint>();
+        if (v2 == m_currentWaypoint)
+        {
+            m_currentWaypoint = null;
         }
     }
 }

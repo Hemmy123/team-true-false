@@ -106,7 +106,7 @@ MonoBehaviour:
   m_upKey: 119
   m_downKey: 115
   m_acceleration: 5
-  m_speed: 5
+  m_speed: 10
   m_dragGrounded: 10
   m_baseJumpSpeed: 10
   m_jumpAssistGravityReduction: 0.5

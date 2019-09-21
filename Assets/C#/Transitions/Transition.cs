@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Transition : MonoBehaviour
 {
-    //
+    //Core variables
     Vector3 m_destinationPos, m_destinationRot, m_destinationScale;
     Vector3 m_originPos, m_originRot, m_originScale;
     float m_remainingTime = 0f;
@@ -14,6 +14,10 @@ public class Transition : MonoBehaviour
     {
         get { return !m_reachedDestination; }
     }
+
+    //Velocity maintenance
+    Vector3 m_velocity = Vector3.zero;
+    bool m_maintainVelocity = false;
 
     //Parabola parameters
     [SerializeField] float m_gravity = 0f;
@@ -34,20 +38,29 @@ public class Transition : MonoBehaviour
     //On update, set position according to transition
     private void FixedUpdate()
     {
-        if(m_remainingTime > 0f)
+        if (m_remainingTime > 0f)
         {
             float lerpParameter = (m_duration - m_remainingTime) / m_duration;
-            //if(m_smoothStopParam != 0f || m_smoothStartParam != 0f)
-            lerpParameter = SetNonLinearParameter(lerpParameter); 
+            lerpParameter = SetNonLinearParameter(lerpParameter);
             SetPositionByParameter(lerpParameter);
             m_remainingTime -= Time.fixedDeltaTime;
         }
         else if (!m_reachedDestination)
         {
-            TransitionFinished();
-            transform.position = m_destinationPos;
-            transform.eulerAngles = m_destinationRot;
-            transform.localScale = m_destinationScale;
+            if (m_maintainVelocity)
+            {
+                TransitionFinished();
+                transform.eulerAngles = m_destinationRot;
+                transform.localScale = m_destinationScale;
+                GetComponent<Rigidbody2D>().velocity = m_velocity;
+            }
+            else
+            {
+                TransitionFinished();
+                transform.position = m_destinationPos;
+                transform.eulerAngles = m_destinationRot;
+                transform.localScale = m_destinationScale;
+            }
         }
     }
 
@@ -69,9 +82,12 @@ public class Transition : MonoBehaviour
     void SetPositionByParameter(float lerpParameter)
     {
         float time = lerpParameter * m_duration;
+        Vector3 previous = transform.position;
         transform.position = Vector3.Lerp(m_originPos, m_destinationPos, lerpParameter) + Vector3.up * time * (m_parabolaU - 0.5f * time * m_gravity);
         transform.eulerAngles = Vector3.Lerp(m_originRot, m_destinationRot, lerpParameter);
         transform.localScale = Vector3.Lerp(m_originScale, m_destinationScale, lerpParameter);
+
+        m_velocity = (transform.position - previous) / Time.fixedDeltaTime;
     }
 
     void TransitionFinished()
@@ -79,7 +95,7 @@ public class Transition : MonoBehaviour
         m_reachedDestination = true;
     }
 
-    public void StartTransition(Transform destination, float duration)
+    public void StartTransition(Transform destination, float duration, bool maintainVelocity = false)
     {
         m_reachedDestination = false;
 
@@ -95,5 +111,7 @@ public class Transition : MonoBehaviour
         m_duration = duration;
 
         m_parabolaU = m_gravity * m_duration * 0.5f;
+
+        m_maintainVelocity = maintainVelocity;
     }
 }
