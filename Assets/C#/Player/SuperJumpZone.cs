@@ -42,7 +42,7 @@ public class SuperJumpZone : MonoBehaviour
 
     public bool CorrectBeat()
     {
-        return m_beatManager.IsOnBeat(m_period, m_beat, m_tolerance);
+        return (Mathf.Abs((m_beatManager.currentBeatProgress % m_period) - m_beat) <= m_tolerance);
     }
 
     public void ApplyJump(Rigidbody2D rb, PlayerMovement move)

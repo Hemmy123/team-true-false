@@ -39,8 +39,6 @@ public class BeatManager : MonoBehaviour
     int m_lastBeat = 0;
     float m_currentBeatProgress = 0f;
     bool m_offbeat = false;
-
-    float m_lastBeatTime = 0f;
     private void FixedUpdate()
     {
 
@@ -50,7 +48,6 @@ public class BeatManager : MonoBehaviour
             var section = GetCurrentSection();
             if(section != null)
             {
-                m_lastBeatTime = m_currentBeatProgress;
                 m_currentBeatProgress = GetCurrentBeat(section);
 
                 if (Mathf.FloorToInt(m_currentBeatProgress) != m_lastBeat)
@@ -99,7 +96,7 @@ public class BeatManager : MonoBehaviour
 
         for (int i = 0; i < sections.Length; ++i)
         {
-            if (musicTime >= sections[i].startTime && musicTime <= sections[i].endTime)
+            if (musicTime > sections[i].startTime && musicTime < sections[i].endTime)
             {
                 //Correct section
                 section = sections[i];
@@ -160,36 +157,18 @@ public class BeatManager : MonoBehaviour
     public bool IsOnBeat(float period, float beat)
     {
         float beatFromBarStart = m_currentBeatProgress % period;
-        float lastBeatFromBarStart = m_lastBeatTime % period;
-
         if(SongIsOver())
         {
             return false;
         }
-        else if(beatFromBarStart > beat && lastBeatFromBarStart <= beat)  //Slightly dodgy 0.3f window but should work for our purposes so long as there are always at least 2 waypoints
-        {
-            return true;
-        }
-        else if (beatFromBarStart > beat && lastBeatFromBarStart > beatFromBarStart)
+        else if(beatFromBarStart >= beat && beatFromBarStart < beat + TimeToBeats(0.3f))  //Slightly dodgy 0.3f window but should work for our purposes so long as there are always at least 2 waypoints
         {
             return true;
         }
         else
         {
-            Debug.Log(beatFromBarStart + "," + lastBeatFromBarStart);
             return false;
         }
-    }
-    //
-    public bool IsOnBeat(float period, float beat, float tolerance)
-    {
-        float beatFromBarStart = m_currentBeatProgress % period;
-        if (Mathf.Abs(beatFromBarStart - beat) <= tolerance || Mathf.Abs(beatFromBarStart - period - beat) <= tolerance)
-        {
-            return true;
-        }
-        else
-            return false;
     }
 
     //

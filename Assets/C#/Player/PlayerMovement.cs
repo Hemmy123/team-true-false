@@ -64,6 +64,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        Debug.Log(m_state);
         if (m_state == PlayerState.TRANSITIONING && !m_transitioner.transitioning)
         {
             m_state = PlayerState.AIRBORNE;
