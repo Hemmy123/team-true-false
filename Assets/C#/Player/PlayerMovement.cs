@@ -21,6 +21,7 @@ public class PlayerMovement : MonoBehaviour
     Transition m_transitioner;
     Collider2D m_collider2D;
     ParticleSystem m_particles;
+    [SerializeField] Animator m_animator;
 
     //
     [SerializeField] LayerMask m_groundLayer;
@@ -62,6 +63,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Update is called once per frame
+    Vector3 m_previousPosition = Vector3.zero;
     void FixedUpdate()
     {
         if (m_state == PlayerState.TRANSITIONING && !m_transitioner.transitioning)
@@ -89,19 +91,80 @@ public class PlayerMovement : MonoBehaviour
         {
             case PlayerState.GROUNDED:
                 GroundedMovement();
+                if (m_rb.velocity.x != 0f)
+                {
+                    SetRunning();
+                }
+                else
+                {
+                    SetIdle();
+                }
                 break;
             case PlayerState.AIRBORNE:
                 AirborneMovement();
+                if(m_rb.velocity.y > 0f)
+                {
+                    SetJumping();
+                }
+                else
+                {
+                    SetFalling();
+                }
                 break;
             case PlayerState.DDR:
                 DDRMovement();
+                SetJumping();
                 break;
             case PlayerState.FALLING:
-                
+                SetFalling();
                 break;
             default:
                 break;
         }
+
+        if(Input.GetKeyDown(m_rightKey))//m_previousPosition.x < transform.position.x)
+        {
+            FaceRight();
+        }
+        else if(Input.GetKeyDown(m_leftKey))//m_previousPosition.x > transform.position.x)
+        {
+            FaceLeft();
+        }
+        m_previousPosition = transform.position;
+    }
+    void FaceLeft()
+    {
+        Vector3 scale = m_animator.transform.localScale;
+        m_animator.transform.localScale = new Vector3(-Mathf.Abs(scale.x), scale.y, -Mathf.Abs(scale.z));
+    }
+    void FaceRight()
+    {
+        Vector3 scale = m_animator.transform.localScale;
+        m_animator.transform.localScale = new Vector3(Mathf.Abs(scale.x), scale.y, Mathf.Abs(scale.z));
+    }
+    void SetFalling()
+    {
+        m_animator.SetBool("Falling", true);
+        m_animator.SetBool("Jumping", false);
+        m_animator.SetBool("Running", false);
+    }
+    void SetRunning()
+    {
+        m_animator.SetBool("Falling", false);
+        m_animator.SetBool("Jumping", false);
+        m_animator.SetBool("Running", true);
+    }
+    void SetJumping()
+    {
+        m_animator.SetBool("Falling", false);
+        m_animator.SetBool("Jumping", true);
+        m_animator.SetBool("Running", false);
+    }
+    void SetIdle()
+    {
+        m_animator.SetBool("Falling", false);
+        m_animator.SetBool("Jumping", false);
+        m_animator.SetBool("Running", false);
     }
 
     void EnablePhysics()
