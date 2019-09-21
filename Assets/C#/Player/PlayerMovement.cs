@@ -113,9 +113,12 @@ public class PlayerMovement : MonoBehaviour
                 break;
             case PlayerState.DDR:
                 DDRMovement();
-                SetJumping();
+                SetDancing();
                 break;
             case PlayerState.FALLING:
+                SetFalling();
+                break;
+            case PlayerState.TRANSITIONING:
                 SetFalling();
                 break;
             default:
@@ -147,24 +150,38 @@ public class PlayerMovement : MonoBehaviour
         m_animator.SetBool("Falling", true);
         m_animator.SetBool("Jumping", false);
         m_animator.SetBool("Running", false);
+        m_animator.SetBool("Dance", false);
     }
     void SetRunning()
     {
         m_animator.SetBool("Falling", false);
         m_animator.SetBool("Jumping", false);
         m_animator.SetBool("Running", true);
+        m_animator.SetBool("Dance", false);
     }
     void SetJumping()
     {
         m_animator.SetBool("Falling", false);
         m_animator.SetBool("Jumping", true);
         m_animator.SetBool("Running", false);
+        m_animator.SetBool("Dance", false);
+        m_animator.transform.eulerAngles = new Vector3(0f, 90f, 0f);
     }
     void SetIdle()
     {
         m_animator.SetBool("Falling", false);
         m_animator.SetBool("Jumping", false);
         m_animator.SetBool("Running", false);
+        m_animator.SetBool("Dance", false);
+        m_animator.transform.eulerAngles = new Vector3(0f, 90f, 0f);
+    }
+    void SetDancing()
+    {
+        m_animator.SetBool("Falling", false);
+        m_animator.SetBool("Jumping", false);
+        m_animator.SetBool("Running", false);
+        m_animator.SetBool("Dance", true);
+        m_animator.transform.eulerAngles = new Vector3(0f, 180f, 0f);
     }
 
     void EnablePhysics()
