@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
     BeatManager m_beatManager;
     Transition m_transitioner;
     Collider2D m_collider2D;
+    ParticleSystem m_particles;
 
     //
     [SerializeField] LayerMask m_groundLayer;
@@ -46,6 +47,7 @@ public class PlayerMovement : MonoBehaviour
         m_beatManager = SingletonObject.GetSingleton("BeatManager").GetComponent<BeatManager>();
         m_transitioner = GetComponent<Transition>();
         m_collider2D = GetComponent<Collider2D>();
+        m_particles = GetComponent<ParticleSystem>();
 
         m_gravity = m_rb.gravityScale;
 
@@ -120,6 +122,7 @@ public class PlayerMovement : MonoBehaviour
             if (m_currentZone != null && m_currentZone.CorrectBeat())
             {
                 m_currentZone.ApplyJump(m_rb, this);
+                m_particles.Play();
             }
             else
             {
