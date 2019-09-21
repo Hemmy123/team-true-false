@@ -14,18 +14,28 @@ public class DDRWaypoint : MonoBehaviour
         RIGHT
     }
     [SerializeField] Transform m_nextWaypoint;
-    [SerializeField] float m_duration = 1f;
+    [SerializeField] float m_travelDuration = 1f;
     [SerializeField] bool m_hasFollowingWaypoint = true;
+    [SerializeField] float m_period = 1f;
     [SerializeField] float m_hitTime = 0f;
     [SerializeField] float m_hitTolerance = 0.2f;
     [SerializeField] Direction m_direction = Direction.UP;
 
     //
     BeatManager m_beatManager;
+    [SerializeField] ParticleSystem m_particles;
 
     private void Start()
     {
         m_beatManager = SingletonObject.GetSingleton("BeatManager").GetComponent<BeatManager>();
+    }
+
+    private void FixedUpdate()
+    {
+        if(m_beatManager.IsOnBeat(m_period, m_hitTime))
+        {
+            m_particles.Play();
+        }
     }
 
     public bool JumpLeft(PlayerMovement move)
@@ -64,10 +74,10 @@ public class DDRWaypoint : MonoBehaviour
     public bool Jump(PlayerMovement move)
     {
         float beatProgress = m_beatManager.currentBeatProgress % 1f;
-        if(Mathf.Abs(beatProgress - m_hitTime) <= m_hitTolerance || Mathf.Abs(beatProgress - 1f - m_hitTime) <= m_hitTolerance)
+        if(m_beatManager.IsOnBeat(m_period, m_hitTime, m_hitTolerance))
         {
-            move.ApplyTransition(m_nextWaypoint, m_duration, m_hasFollowingWaypoint);
-            move.ddrCurrentDuration = m_beatManager.BeatsToTime(m_duration + m_hitTolerance);
+            move.ApplyTransition(m_nextWaypoint, m_travelDuration, m_hasFollowingWaypoint);
+            move.ddrCurrentDuration = m_beatManager.BeatsToTime(m_travelDuration + m_hitTolerance);
             return true;
         }
         return false;
