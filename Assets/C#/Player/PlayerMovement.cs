@@ -18,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody2D m_rb;
     BeatManager m_beatManager;
     Transition m_transitioner;
+    Collider2D m_collider2D;
 
     //
     [SerializeField] LayerMask m_groundLayer;
@@ -44,6 +45,7 @@ public class PlayerMovement : MonoBehaviour
         m_rb = GetComponent<Rigidbody2D>();
         m_beatManager = SingletonObject.GetSingleton("BeatManager").GetComponent<BeatManager>();
         m_transitioner = GetComponent<Transition>();
+        m_collider2D = GetComponent<Collider2D>();
 
         m_gravity = m_rb.gravityScale;
 
@@ -56,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
         {
             m_state = PlayerState.GROUNDED;
             m_rb.gravityScale = m_gravity;
+            m_collider2D.enabled = true;
         }
         CheckIfLanded();
 
@@ -69,6 +72,8 @@ public class PlayerMovement : MonoBehaviour
                 break;
             case PlayerState.DDR:
                 DDRMovement();
+                break;
+            default:
                 break;
         }
     }
@@ -110,7 +115,9 @@ public class PlayerMovement : MonoBehaviour
         //Jump stuff
         if(Input.GetKey(m_upKey))
         {
-            if(m_currentZone != null && m_currentZone.CorrectBeat())
+            m_state = PlayerState.AIRBORNE;
+
+            if (m_currentZone != null && m_currentZone.CorrectBeat())
             {
                 m_currentZone.ApplyJump(m_rb, this);
             }
@@ -118,8 +125,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 m_rb.velocity = new Vector2(m_rb.velocity.x, m_baseJumpSpeed);
             }
-
-            m_state = PlayerState.AIRBORNE;
         }
     }
 
@@ -138,7 +143,7 @@ public class PlayerMovement : MonoBehaviour
     }
     void CheckIfLanded()
     {
-        if ((m_rb.velocity.y <= 0f || m_state == PlayerState.GROUNDED) && m_state != PlayerState.DDR)
+        if ((m_rb.velocity.y <= 0f || m_state == PlayerState.GROUNDED) && m_state != PlayerState.DDR && m_state != PlayerState.TRANSITIONING)
         {
             if (Physics2D.Raycast(transform.position + Vector3.right * 0.5f, Vector2.down, .75f, m_groundLayer) || Physics2D.Raycast(transform.position - Vector3.right * 0.5f, Vector2.down, .75f, m_groundLayer))
             {
@@ -163,6 +168,7 @@ public class PlayerMovement : MonoBehaviour
         m_transitioner.StartTransition(waypoint, m_beatManager.BeatsToTime(beatDuration));
         m_state = PlayerState.TRANSITIONING;
         m_rb.gravityScale = 0f;
+        m_collider2D.enabled = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
