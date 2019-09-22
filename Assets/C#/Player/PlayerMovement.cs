@@ -240,13 +240,12 @@ public class PlayerMovement : MonoBehaviour
             {
                 m_currentZone.ApplyJump(m_rb, this);
                 m_particles.Play();
-                m_jumpSound.pitch = 0.7f;
                 m_jumpSound.Play();
+                m_ddrSound.Play();
             }
             else
             {
                 m_rb.velocity = new Vector2(m_rb.velocity.x, m_baseJumpSpeed);
-                m_jumpSound.pitch = 1f;
                 m_jumpSound.Play();
             }
         }
@@ -296,7 +295,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if ((m_rb.velocity.y <= 0f || m_state == PlayerState.GROUNDED))
         {
-            if (Physics2D.Raycast(transform.position + Vector3.right * 0.4f, Vector2.down, .75f, m_groundLayer) || Physics2D.Raycast(transform.position - Vector3.right * 0.4f, Vector2.down, .75f, m_groundLayer))
+            if (Physics2D.Raycast(transform.position, Vector2.down, .55f, m_groundLayer))
             {
                 m_state = PlayerState.GROUNDED;
             }
