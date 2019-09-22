@@ -20,7 +20,7 @@ public class Menu : MonoBehaviour
 
     void ChangeText()
     {
-        m_initialText.SetActive(false);
-        m_helpText.SetActive(true);
+        m_initialText.SetActive(!m_initialText.activeSelf);
+        m_helpText.SetActive(!m_helpText.activeSelf);
     }
 }

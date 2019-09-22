@@ -864,6 +864,36 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 394711020}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &214167725
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 214167726}
+  m_Layer: 0
+  m_Name: Section4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &214167726
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 214167725}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 227.6, y: 188.2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &233608023
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1098,6 +1128,31 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5932154683888753780, guid: 37d4c749d6aa20548ab8a12686604c82,
+        type: 3}
+      propertyPath: m_beat
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5932154683262892351, guid: 37d4c749d6aa20548ab8a12686604c82,
+        type: 3}
+      propertyPath: m_waypoints.Array.data[0].startBeat
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5932154683262892351, guid: 37d4c749d6aa20548ab8a12686604c82,
+        type: 3}
+      propertyPath: m_waypoints.Array.data[0].endBeat
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5932154683262892351, guid: 37d4c749d6aa20548ab8a12686604c82,
+        type: 3}
+      propertyPath: m_waypoints.Array.data[1].startBeat
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5932154683262892351, guid: 37d4c749d6aa20548ab8a12686604c82,
+        type: 3}
+      propertyPath: m_waypoints.Array.data[1].endBeat
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 37d4c749d6aa20548ab8a12686604c82, type: 3}
@@ -2396,7 +2451,7 @@ Transform:
   - {fileID: 104906962}
   - {fileID: 843646826}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &594047162 stripped
 Transform:
@@ -3845,7 +3900,7 @@ Transform:
   - {fileID: 1952448679}
   - {fileID: 448184771}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &903449036 stripped
 Transform:
@@ -7281,7 +7336,7 @@ Transform:
   - {fileID: 1023809143}
   - {fileID: 866993308}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1589918242 stripped
 Transform:
@@ -9093,7 +9148,7 @@ Transform:
   - {fileID: 646077356}
   - {fileID: 71002327}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2045560809
 PrefabInstance:
@@ -9180,7 +9235,27 @@ PrefabInstance:
     - target: {fileID: 5932154683888753780, guid: 37d4c749d6aa20548ab8a12686604c82,
         type: 3}
       propertyPath: m_beat
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5932154683262892351, guid: 37d4c749d6aa20548ab8a12686604c82,
+        type: 3}
+      propertyPath: m_waypoints.Array.data[0].startBeat
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5932154683262892351, guid: 37d4c749d6aa20548ab8a12686604c82,
+        type: 3}
+      propertyPath: m_waypoints.Array.data[0].endBeat
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5932154683262892351, guid: 37d4c749d6aa20548ab8a12686604c82,
+        type: 3}
+      propertyPath: m_waypoints.Array.data[1].startBeat
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5932154683262892351, guid: 37d4c749d6aa20548ab8a12686604c82,
+        type: 3}
+      propertyPath: m_waypoints.Array.data[1].endBeat
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 37d4c749d6aa20548ab8a12686604c82, type: 3}

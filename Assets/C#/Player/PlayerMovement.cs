@@ -231,10 +231,11 @@ public class PlayerMovement : MonoBehaviour
 
     void JumpMovement()
     {
-        if (Input.GetKey(m_upKey))
+        if (Input.GetKeyDown(m_upKey) || Input.GetKeyDown(KeyCode.Space))
         {
             m_state = PlayerState.AIRBORNE;
             m_remainingCoyoteTime = 0f;
+            EnablePhysics();
 
             if (m_currentZone != null && m_currentZone.CorrectBeat())
             {
@@ -282,11 +283,11 @@ public class PlayerMovement : MonoBehaviour
 
         HorizontalMovement();
 
-        if(!Input.GetKey(m_upKey) && m_rb.velocity.y > 0f)
+        if(!(Input.GetKey(m_upKey) || Input.GetKey(KeyCode.Space)) && m_rb.velocity.y > 0f)
         {
-            m_rb.velocity = m_rb.velocity + Vector2.down * Time.deltaTime * m_baseJumpSpeed * 2;
+            m_rb.velocity = new Vector2(m_rb.velocity.x, m_rb.velocity.y * 0.9f);
         }
-        else
+        else if(m_rb.velocity.y < 0f)
         {
             m_rb.gravityScale = m_gravity;
         }
@@ -302,6 +303,7 @@ public class PlayerMovement : MonoBehaviour
             else if (m_state == PlayerState.GROUNDED)
             {
                 m_state = PlayerState.AIRBORNE;
+                EnablePhysics();
                 m_remainingCoyoteTime = m_coyoteTime;
             }
         }
@@ -312,7 +314,7 @@ public class PlayerMovement : MonoBehaviour
         if(m_currentWaypoint != null)
         {
             bool success = false;
-            if(Input.GetKeyDown(m_upKey))
+            if(Input.GetKeyDown(m_upKey) || Input.GetKeyDown(KeyCode.Space))
                 success = m_currentWaypoint.JumpUp(this);
             if(Input.GetKeyDown(m_downKey))
                 success = m_currentWaypoint.JumpDown(this);
