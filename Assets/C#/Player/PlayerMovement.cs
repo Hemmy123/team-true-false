@@ -68,7 +68,7 @@ public class PlayerMovement : MonoBehaviour
 
     // Update is called once per frame
     Vector3 m_previousPosition = Vector3.zero;
-    void FixedUpdate()
+    void Update()
     {
         if (m_state == PlayerState.TRANSITIONING && !m_transitioner.transitioning)
         {
@@ -84,7 +84,7 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                m_ddrCurrentDuration -= Time.fixedDeltaTime;
+                m_ddrCurrentDuration -= Time.deltaTime;
             }
         }
 
@@ -219,7 +219,7 @@ public class PlayerMovement : MonoBehaviour
         if (Mathf.Abs(m_rb.velocity.x) > m_speed * m_beatManager.currentBPM / 120f)
         {
             //If above max speed, slow down
-            m_rb.velocity = new Vector2(m_rb.velocity.x - Mathf.Sign(m_rb.velocity.x) * m_dragGrounded * modifier * Time.fixedDeltaTime, m_rb.velocity.y);
+            m_rb.velocity = new Vector2(m_rb.velocity.x - Mathf.Sign(m_rb.velocity.x) * m_dragGrounded * modifier * Time.deltaTime, m_rb.velocity.y);
         }
         else
         {
@@ -273,7 +273,7 @@ public class PlayerMovement : MonoBehaviour
         if(m_remainingCoyoteTime > 0f)
         {
             JumpMovement();
-            m_remainingCoyoteTime -= Time.fixedDeltaTime;
+            m_remainingCoyoteTime -= Time.deltaTime;
         }
 
         HorizontalMovement();
