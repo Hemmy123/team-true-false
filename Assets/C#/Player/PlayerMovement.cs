@@ -231,7 +231,7 @@ public class PlayerMovement : MonoBehaviour
 
     void JumpMovement()
     {
-        if (Input.GetKey(m_upKey) || Input.GetKey(KeyCode.Space))
+        if (Input.GetKeyDown(m_upKey) || Input.GetKeyDown(KeyCode.Space))
         {
             m_state = PlayerState.AIRBORNE;
             m_remainingCoyoteTime = 0f;
@@ -285,13 +285,11 @@ public class PlayerMovement : MonoBehaviour
 
         if(!(Input.GetKey(m_upKey) || Input.GetKey(KeyCode.Space)) && m_rb.velocity.y > 0f)
         {
-            m_rb.velocity = new Vector2(m_rb.velocity.x, -0.5f * m_baseJumpSpeed);
+            m_rb.velocity = new Vector2(m_rb.velocity.x, m_rb.velocity.y * 0.9f);
         }
         else if(m_rb.velocity.y < 0f)
         {
-            if (m_rb.velocity.y > -0.5f * m_baseJumpSpeed)
-                m_rb.velocity = new Vector2(m_rb.velocity.x, -0.5f * m_baseJumpSpeed);
-            m_rb.gravityScale = 0.5f * m_gravity;
+            m_rb.gravityScale = m_gravity;
         }
     }
     void CheckIfLanded()
