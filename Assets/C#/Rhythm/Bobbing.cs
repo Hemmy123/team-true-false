@@ -20,7 +20,7 @@ public class Bobbing : MonoBehaviour
 
     void FixedUpdate()
     {
-        float phase = (m_radianOffset + m_beatManager.currentBeatProgress / m_period) * 2f * Mathf.PI;
+        float phase = (m_radianOffset + m_beatManager.currentBeatProgress / m_period * 2f) * Mathf.PI;
         float xScale = 1f + m_xChange * Mathf.Sin(phase);
         float yScale = 1f - m_yChange * Mathf.Sin(phase);
 
