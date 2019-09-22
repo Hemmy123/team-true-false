@@ -314,7 +314,7 @@ public class PlayerMovement : MonoBehaviour
         if(m_currentWaypoint != null)
         {
             bool success = false;
-            if(Input.GetKeyDown(m_upKey) || Input.GetKeyDown(KeyCode.Space))
+            if(Input.GetKeyDown(m_upKey))
                 success = m_currentWaypoint.JumpUp(this);
             if(Input.GetKeyDown(m_downKey))
                 success = m_currentWaypoint.JumpDown(this);

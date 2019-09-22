@@ -110,8 +110,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_gravity: 0
-  m_type: 2
-  m_smoothStartParam: 1
+  m_type: 1
+  m_smoothStartParam: 2
   m_smoothStopParam: 2
 --- !u!114 &6162955316997616052
 MonoBehaviour:

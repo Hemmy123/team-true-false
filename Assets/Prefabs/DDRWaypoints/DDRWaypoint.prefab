@@ -50,7 +50,7 @@ MonoBehaviour:
   m_hasFollowingWaypoint: 1
   m_period: 1
   m_hitTime: 0
-  m_hitTolerance: 0.2
+  m_hitTolerance: 0.3
   m_direction: 0
   m_particles: {fileID: 8293076289336720075}
 --- !u!61 &1515150899728122749
