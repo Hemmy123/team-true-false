@@ -9,6 +9,10 @@ public class Menu : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.H))
             ChangeText();
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 
     [SerializeField] GameObject m_initialText;
