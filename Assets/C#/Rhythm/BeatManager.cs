@@ -161,6 +161,7 @@ public class BeatManager : MonoBehaviour
     {
         float beatFromBarStart = m_currentBeatProgress % period;
         float lastBeatFromBarStart = m_lastBeatTime % period;
+        beat %= period;
 
         if(SongIsOver())
         {
@@ -183,6 +184,7 @@ public class BeatManager : MonoBehaviour
     public bool IsOnBeat(float period, float beat, float tolerance)
     {
         float beatFromBarStart = m_currentBeatProgress % period;
+        beat %= period;
         if (Mathf.Abs(beatFromBarStart - beat) <= tolerance || Mathf.Abs(beatFromBarStart - period - beat) <= tolerance)
         {
             return true;

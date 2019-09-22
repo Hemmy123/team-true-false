@@ -233,7 +233,7 @@ MonoBehaviour:
   m_tolerance: 0.2
   m_waypoint: {fileID: 0}
   m_transitionBeatDuration: 0
-  m_force: {x: 0, y: 20}
+  m_force: {x: 0, y: 25}
 --- !u!1 &5932154683996176207
 GameObject:
   m_ObjectHideFlags: 0
