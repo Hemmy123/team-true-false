@@ -22,7 +22,8 @@ public class PlayerMovement : MonoBehaviour
     Collider2D m_collider2D;
     ParticleSystem m_particles;
     [SerializeField] Animator m_animator;
-    AudioSource m_audioSource;
+    [SerializeField] AudioSource m_ddrSound;
+    [SerializeField] AudioSource m_jumpSound;
 
     //
     [SerializeField] LayerMask m_groundLayer;
@@ -38,7 +39,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float m_dragGrounded = 10f;//scaled by (bpm / 120f)
     [SerializeField] float m_baseJumpSpeed = 5f;
     [SerializeField] float m_jumpAssistGravityReduction = 0.25f;
+    [SerializeField] float m_coyoteTime = 0.2f;
     float m_gravity = 0f;
+    float m_remainingCoyoteTime = 0f;
 
     //
     SuperJumpZone m_currentZone = null;
@@ -58,7 +61,7 @@ public class PlayerMovement : MonoBehaviour
         m_transitioner = GetComponent<Transition>();
         m_collider2D = GetComponent<Collider2D>();
         m_particles = GetComponent<ParticleSystem>();
-        m_audioSource = GetComponent<AudioSource>();
+        m_ddrSound = GetComponent<AudioSource>();
 
         m_gravity = m_rb.gravityScale;
 
@@ -66,7 +69,7 @@ public class PlayerMovement : MonoBehaviour
 
     // Update is called once per frame
     Vector3 m_previousPosition = Vector3.zero;
-    void FixedUpdate()
+    void Update()
     {
         if (m_state == PlayerState.TRANSITIONING && !m_transitioner.transitioning)
         {
@@ -82,7 +85,7 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                m_ddrCurrentDuration -= Time.fixedDeltaTime;
+                m_ddrCurrentDuration -= Time.deltaTime;
             }
         }
 
@@ -217,12 +220,35 @@ public class PlayerMovement : MonoBehaviour
         if (Mathf.Abs(m_rb.velocity.x) > m_speed * m_beatManager.currentBPM / 120f)
         {
             //If above max speed, slow down
-            m_rb.velocity = new Vector2(m_rb.velocity.x - Mathf.Sign(m_rb.velocity.x) * m_dragGrounded * modifier * Time.fixedDeltaTime, m_rb.velocity.y);
+            m_rb.velocity = new Vector2(m_rb.velocity.x - Mathf.Sign(m_rb.velocity.x) * m_dragGrounded * modifier * Time.deltaTime, m_rb.velocity.y);
         }
         else
         {
             //Otherwise, set speed
             m_rb.velocity = new Vector2(speed, m_rb.velocity.y);
+        }
+    }
+
+    void JumpMovement()
+    {
+        if (Input.GetKey(m_upKey))
+        {
+            m_state = PlayerState.AIRBORNE;
+            m_remainingCoyoteTime = 0f;
+
+            if (m_currentZone != null && m_currentZone.CorrectBeat())
+            {
+                m_currentZone.ApplyJump(m_rb, this);
+                m_particles.Play();
+                m_jumpSound.pitch = 0.7f;
+                m_jumpSound.Play();
+            }
+            else
+            {
+                m_rb.velocity = new Vector2(m_rb.velocity.x, m_baseJumpSpeed);
+                m_jumpSound.pitch = 1f;
+                m_jumpSound.Play();
+            }
         }
     }
 
@@ -238,20 +264,7 @@ public class PlayerMovement : MonoBehaviour
         HorizontalMovement();
 
         //Jump stuff
-        if(Input.GetKey(m_upKey))
-        {
-            m_state = PlayerState.AIRBORNE;
-
-            if (m_currentZone != null && m_currentZone.CorrectBeat())
-            {
-                m_currentZone.ApplyJump(m_rb, this);
-                m_particles.Play();
-            }
-            else
-            {
-                m_rb.velocity = new Vector2(m_rb.velocity.x, m_baseJumpSpeed);
-            }
-        }
+        JumpMovement();
     }
 
     void AirborneMovement()
@@ -260,6 +273,12 @@ public class PlayerMovement : MonoBehaviour
         {
             m_particles.Play();
             return;
+        }
+
+        if(m_remainingCoyoteTime > 0f)
+        {
+            JumpMovement();
+            m_remainingCoyoteTime -= Time.deltaTime;
         }
 
         HorizontalMovement();
@@ -284,6 +303,7 @@ public class PlayerMovement : MonoBehaviour
             else if (m_state == PlayerState.GROUNDED)
             {
                 m_state = PlayerState.AIRBORNE;
+                m_remainingCoyoteTime = m_coyoteTime;
             }
         }
     }
@@ -303,7 +323,7 @@ public class PlayerMovement : MonoBehaviour
                 success = m_currentWaypoint.JumpRight(this);
 
             if (success)
-                m_audioSource.Play();
+                m_ddrSound.Play();
             return success;
         }
         return false;
@@ -328,6 +348,7 @@ public class PlayerMovement : MonoBehaviour
             m_state = PlayerState.TRANSITIONING;
         }
         DisablePhysics();
+        m_remainingCoyoteTime = 0f;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
