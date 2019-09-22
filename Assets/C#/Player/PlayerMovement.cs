@@ -282,14 +282,14 @@ public class PlayerMovement : MonoBehaviour
 
         HorizontalMovement();
 
-        //if(Input.GetKey(m_upKey) && m_rb.velocity.y > 0f)
-        //{
-        //    m_rb.gravityScale = m_gravity * m_jumpAssistGravityReduction;
-        //}
-        //else
-        //{
-        //    m_rb.gravityScale = m_gravity;
-        //}
+        if(!Input.GetKey(m_upKey) && m_rb.velocity.y > 0f)
+        {
+            m_rb.velocity = m_rb.velocity + Vector2.down * Time.deltaTime * m_baseJumpSpeed * 2;
+        }
+        else
+        {
+            m_rb.gravityScale = m_gravity;
+        }
     }
     void CheckIfLanded()
     {
