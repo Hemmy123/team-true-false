@@ -240,13 +240,11 @@ public class PlayerMovement : MonoBehaviour
             {
                 m_currentZone.ApplyJump(m_rb, this);
                 m_particles.Play();
-                m_jumpSound.pitch = 0.7f;
                 m_jumpSound.Play();
             }
             else
             {
                 m_rb.velocity = new Vector2(m_rb.velocity.x, m_baseJumpSpeed);
-                m_jumpSound.pitch = 1f;
                 m_jumpSound.Play();
             }
         }
