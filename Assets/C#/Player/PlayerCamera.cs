@@ -15,7 +15,7 @@ public class PlayerCamera : MonoBehaviour
         float distance = (transform.position - targetPosition).magnitude;
         if (distance != 0)
         {
-            transform.position += Time.fixedDeltaTime * (targetPosition - transform.position).normalized * m_baseSpeed * Mathf.Pow(distance, m_exponent);
+            transform.position += Time.fixedDeltaTime * (targetPosition - transform.position) * m_baseSpeed;
         }
     }
 }

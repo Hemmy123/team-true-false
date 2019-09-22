@@ -379,7 +379,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (collision.tag == "Boundary" && m_state != PlayerState.TRANSITIONING)
         {
-            Utils.RestartLevel();
+            Transform reentry = collision.transform.GetChild(0);
+            transform.position = reentry.position;
         }
     }
 }
