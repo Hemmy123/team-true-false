@@ -14,7 +14,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ChrisTestLevel.unity
     guid: 995407190f71be945acc257d7f88b2fc
-  - enabled: 1
-    path: Assets/Scenes/HemmyTestScene.unity
-    guid: f0b9c0d0d82f8ad46a364ff361b62eeb
   m_configObjects: {}
